@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'io.objectbox.android.transform'
 
 android {
     compileSdkVersion 26
@@ -14,6 +15,10 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
     }
 
     dataBinding {
@@ -29,9 +34,13 @@ android {
 
 }
 
+    // Until the ObjectBox Gradle plugin has better support for Kotlin, we must help it a bit:
+    //task('compileKotlin').dependsOn objectbox
+    android.sourceSets.main.java.srcDirs += 'build/generated/source/objectbox'
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation ('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
@@ -40,8 +49,14 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
 
-    implementation "android.arch.persistence.room:runtime:$room_version"
-    implementation "android.arch.persistence.room:rxjava2:$room_version"
+
+    implementation "io.objectbox:objectbox-android:$objectBoxVersion"
+    implementation "io.objectbox:objectbox-kotlin:$objectBoxVersion"
+    implementation "io.objectbox:objectbox-rxjava:$objectBoxRxVersion"
+    kapt "io.objectbox:objectbox-processor:$objectBoxVersion"
+
+    compile "android.arch.persistence.room:runtime:$room_version"
+    compile "android.arch.persistence.room:rxjava2:$room_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
 
     implementation "io.reactivex.rxjava2:rxandroid:$rx_android_version"
