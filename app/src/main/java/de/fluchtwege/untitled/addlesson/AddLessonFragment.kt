@@ -1,4 +1,4 @@
-package de.fluchtwege.untitled.addquestion
+package de.fluchtwege.untitled.addlesson
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -6,30 +6,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import de.fluchtwege.untitled.Untitled
+import de.fluchtwege.untitled.databinding.FragmentAddLessonBinding
 import de.fluchtwege.untitled.lessons.LessonsRepository
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class AddQuestionFragment : Fragment() {
+class AddLessonFragment : Fragment() {
 
     @Inject
     lateinit var lessonsRepository: LessonsRepository
 
-    lateinit var viewModel: AddQuestionViewModel
+    lateinit var viewModel: AddLessonViewModel
 
     private var disposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Untitled.appComponent.inject(this)
-        viewModel = AddQuestionViewModel(lessonsRepository)
+        viewModel = AddLessonViewModel(lessonsRepository)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        val binding = FragmentAddQuestionBinding.inflate(inflater!!)
-//        binding.viewModel = viewModel
-//        return binding.root
-        return null
+        val binding = FragmentAddLessonBinding.inflate(inflater!!)
+        binding.viewModel = viewModel
+        binding.saveLesson.setOnClickListener { _ -> saveLesson() }
+        return binding.root
+    }
+
+    private fun saveLesson() {
+        disposable = viewModel.save { activity.finish() }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable?.dispose()
     }
 
 }
