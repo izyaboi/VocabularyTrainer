@@ -3,6 +3,7 @@ package de.fluchtwege.untitled.persistance
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
+import android.arch.persistence.room.Update
 import de.fluchtwege.untitled.models.Lesson
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -22,4 +23,6 @@ interface LessonDao {
     @Insert
     fun insert(lesson: Lesson): Unit
 
+    @Update
+    fun update(lesson: Lesson): Unit
 }

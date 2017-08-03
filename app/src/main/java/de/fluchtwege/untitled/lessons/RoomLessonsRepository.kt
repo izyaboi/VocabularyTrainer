@@ -11,9 +11,9 @@ class RoomLessonsRepository(val lessonsController: LessonsController, val databa
                             val observeOn: Scheduler, val subscribeOn: Scheduler) : LessonsRepository {
 
     override fun addLesson(lesson: Lesson) = Completable.defer {
-                database.lessonDao().insert(lesson)
-                return@defer Completable.complete()
-            }.subscribeOn(subscribeOn)
+        database.lessonDao().insert(lesson)
+        return@defer Completable.complete()
+    }.subscribeOn(subscribeOn)
             .observeOn(observeOn)
 
 
@@ -45,7 +45,18 @@ class RoomLessonsRepository(val lessonsController: LessonsController, val databa
     override fun getLessons(): Flowable<List<Lesson>> = database.lessonDao().getLessons()
             .subscribeOn(subscribeOn).observeOn(observeOn)
 
-    override fun addQuestion(question: Question) = Completable.complete()
+    override fun addQuestion(lessonName: String, question: Question) = database.lessonDao()
+            .getLesson(lessonName)
+            .subscribeOn(subscribeOn)
+            .first(Lesson("", "", emptyList()))
+            .flatMapCompletable {
+                val questions = it.questions.toMutableList()
+                questions.add(question)
+                it.questions = questions
+                database.lessonDao().update(it)
+                return@flatMapCompletable Completable.complete()
+
+            }.observeOn(observeOn)
 
     override fun clearRepository() = Completable.defer {
         database.lessonDao().clearLessons()
