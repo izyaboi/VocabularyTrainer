@@ -27,6 +27,7 @@ buildscript {
         classpath "io.objectbox:objectbox-gradle-plugin:$objectBoxVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
+
 }
 
 allprojects {
