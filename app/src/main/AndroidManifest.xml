@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.fluchtwege.untitled">
+          package="de.fluchtwege.untitled">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 
     <application
@@ -15,20 +15,21 @@
 
         <activity android:name=".lessons.LessonsActivity">
             <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
 
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
             </intent-filter>
         </activity>
 
-        <activity android:name=".questions.QuestionsActivity" />
-        <activity
-            android:name=".addquestion.AddQuestionActivity"
-            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".questions.QuestionsActivity"/>
         <activity
             android:name=".addlesson.AddLessonActivity"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".addquestion.AddQuestionActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".quiz.QuizActivity"/>
 
     </application>
 </manifest>

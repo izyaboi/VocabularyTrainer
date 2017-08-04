@@ -1,4 +1,4 @@
-package de.fluchtwege.untitled.addquestion
+package de.fluchtwege.untitled.quiz
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -6,46 +6,38 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import de.fluchtwege.untitled.Untitled
-import de.fluchtwege.untitled.databinding.FragmentAddQuestionBinding
+import de.fluchtwege.untitled.databinding.FragmentQuizBinding
 import de.fluchtwege.untitled.lessons.LessonsRepository
 import de.fluchtwege.untitled.questions.QuestionsFragment
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class AddQuestionFragment : Fragment() {
+class QuizFragment: Fragment() {
 
     @Inject
     lateinit var lessonsRepository: LessonsRepository
 
-    lateinit var viewModel: AddQuestionViewModel
+    lateinit var viewModel: QuizViewModel
 
-    private var disposable: Disposable? = null
+    var disposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Untitled.appComponent.inject(this)
         val lessonName = activity.intent.getStringExtra(QuestionsFragment.KEY_LESSON_NAME)
-        val questionPosition = activity.intent.getIntExtra(QuestionsFragment.KEY_QUESTION_POSITION, -1)
-        viewModel = AddQuestionViewModel(lessonsRepository, lessonName, questionPosition)
+        viewModel = QuizViewModel(lessonName, lessonsRepository)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentAddQuestionBinding.inflate(inflater!!)
-
-        binding.saveQuestion.setOnClickListener { _ -> saveQuestion() }
+        val binding = FragmentQuizBinding.inflate(inflater!!)
         binding.viewModel = viewModel
+        binding.next.setOnClickListener { viewModel.onNext { activity.finish() } }
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        if (!viewModel.isNewQuestion()) {
-            disposable = viewModel.loadQuestion()
-        }
-    }
-
-    private fun saveQuestion() {
-        disposable = viewModel.save { activity.finish() }
+        disposable = viewModel.getLesson()
     }
 
     override fun onDestroy() {

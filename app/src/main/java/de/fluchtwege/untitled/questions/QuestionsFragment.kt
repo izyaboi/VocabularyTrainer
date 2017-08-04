@@ -11,7 +11,7 @@ import de.fluchtwege.untitled.Untitled
 import de.fluchtwege.untitled.addquestion.AddQuestionActivity
 import de.fluchtwege.untitled.databinding.FragmentQuestionsBinding
 import de.fluchtwege.untitled.lessons.LessonsRepository
-import io.reactivex.android.schedulers.AndroidSchedulers
+import de.fluchtwege.untitled.quiz.QuizActivity
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
@@ -20,12 +20,14 @@ class QuestionsFragment : Fragment() {
 
     companion object {
         const val KEY_LESSON_NAME = "lesson_name"
+        const val KEY_QUESTION_POSITION = "question_position"
     }
 
     @Inject
     lateinit var lessonsRepository: LessonsRepository
 
     lateinit var viewModel: QuestionsViewModel
+    lateinit var questionsAdapter: QuestionsAdaper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,13 +35,13 @@ class QuestionsFragment : Fragment() {
         Untitled.appComponent.inject(this)
         val lessonName = activity.intent.getStringExtra(KEY_LESSON_NAME)
         viewModel = QuestionsViewModel(lessonName, lessonsRepository)
+        questionsAdapter = QuestionsAdaper(viewModel, this::editQuestion, this::deleteQuestion )
     }
 
     private var disposable: Disposable? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentQuestionsBinding.inflate(inflater!!)
-        val questionsAdapter = QuestionsAdaper(viewModel)
         val layoutManager = LinearLayoutManager(context)
         binding.questions.adapter = questionsAdapter
         binding.questions.layoutManager = layoutManager
@@ -61,6 +63,17 @@ class QuestionsFragment : Fragment() {
         return true
     }
 
+    private fun editQuestion(position: Int) {
+        val openAddQuestion = Intent(context, AddQuestionActivity::class.java)
+        openAddQuestion.putExtra(KEY_LESSON_NAME, viewModel.lessonName)
+        openAddQuestion.putExtra(KEY_QUESTION_POSITION, position)
+        startActivity(openAddQuestion)
+    }
+
+    private fun deleteQuestion(position: Int) {
+        disposable = viewModel.deleteQuestion(position, questionsAdapter::notifyDataSetChanged)
+    }
+
     private fun addQuestion() {
         val openAddQuestion = Intent(context, AddQuestionActivity::class.java)
         openAddQuestion.putExtra(KEY_LESSON_NAME, viewModel.lessonName)
@@ -68,8 +81,9 @@ class QuestionsFragment : Fragment() {
     }
 
     private fun startQuiz() {
-
-
+        val openQuiz = Intent(context, QuizActivity::class.java)
+        openQuiz.putExtra(KEY_LESSON_NAME, viewModel.lessonName)
+        startActivity(openQuiz)
     }
 
     override fun onDestroy() {
