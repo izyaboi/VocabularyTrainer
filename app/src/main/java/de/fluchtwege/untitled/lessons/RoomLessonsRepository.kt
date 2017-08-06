@@ -31,7 +31,7 @@ class RoomLessonsRepository(val lessonsController: LessonsController, val databa
         return@defer Completable.complete()
     }.subscribeOn(subscribeOn).observeOn(observeOn)
 
-    override fun updateLesson(lesson: Lesson) = Completable.defer{
+    override fun updateLesson(lesson: Lesson) = Completable.defer {
         database.lessonDao().update(lesson)
         return@defer Completable.complete()
     }.subscribeOn(subscribeOn).observeOn(observeOn)
